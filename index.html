@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ЭБ 1361.2. Проверка знаний электротехнического и электротехнологического персонала организаций, осуществляющего эксплуатацию электроустановок потребителей с применением электродвигателей как основного оборудования (IV группа по электробезопасности до 1000 В). Выбор билета. Бесплатное тестирование по вопросам охраны труда, промышленной безопасности (тесты Ростехнадзора), электробезопасности. Онлайн подготовка и проверка знаний.">
+  <link rel="icon" type="image/png" href="favicon.ico" sizes="96x96">
+  <title>Тесты</title>
+  <link rel="stylesheet" href="style.css">
+  <script src='data1361.2.js'></script>
+</head>
+
+<body>
+  <h1 class="header">ЭБ 1361.2. Проверка знаний электротехнического и электротехнологического персонала организаций, осуществляющего эксплуатацию электроустановок потребителей с применением электродвигателей как основного оборудования (IV группа по электробезопасности до 1000 В)</h1><br>
+  <a href="https://tests24.ru/?iter=3&test=591">сайт</a><br>
+  <div class="main">
+    <button class="btn start" onclick="start();">Начать тест</button>
+  </div>
+  <div class="content"></div>
+  <div class="buttons">
+    <!--    <button class="btn none" id="back" onclick="back();">Назад</button> -->
+    <button class="btn none" id="forward" onclick="forward();">Вперёд</button>
+    <button class="btn none" id="end" onclick="end();">Прервать тест</button>
+  </div>
+  <div class="result none"></div>
+  <div>
+    <button class="btn none start" id="restart" onclick="location.reload()">Начать заново</button>
+  </div>
+  <script>
+    let res_ans = "";
+    let countQuestions = array.length;
+    let i = 0;
+    let qs = el => document.querySelector(el);
+    let block = qs(".main");
+    let content = qs(".content");
+    let header = qs(".header");
+    let result = qs(".result");
+    let text = "";
+    let title = "";
+    let btnBack = qs("#back");
+    let btnForward = qs("#forward");
+    let btnEnd = qs("#end");
+    let btnRestart = qs("#restart");
+
+    document.querySelector('.content').addEventListener('click', (e) => {
+      if (e.target.nodeName == "LABEL") btnForward.style = 'cursor: pointer;'
+    })
+
+    document.querySelector('.header').addEventListener('click', showAllCorrectAnswers)
+
+    function start() {
+      document.links[0].style.display = 'none';
+      cycle();
+      i++;
+      write();
+      btnForward.classList.remove("none");
+      block.classList.add("none");
+      header.classList.add("none");
+    }
+
+    function cycle() {
+      text += `<h3>${array[i].question}</h3>`;
+      let type = 'radio';
+      if (Array.isArray(array[i].correctAnswer)) {
+        type = 'checkbox';
+      }
+      for (let el of array[i].variantsOfAnswers) {
+        text += `<div class="ans">
+                     <label><input type=${type} name="text-answer">${el}</input></label>
+                   </div>`;
+      }
+    }
+
+    function checkAns() {
+      let txt = '';
+      let ans_user = [...document.querySelectorAll("input")];
+
+      if (!ans_user.some(el => el.checked)) return false; // если (пока) не выбрали ответ, перейти на следующий вопрос нельзя
+      if (Array.isArray(array[i - 1].correctAnswer)) { // если правильных ответов несколько
+        let a1 = ans_user.filter(el => el.checked) // останутся только чекбоксы с галками
+        let a2 = [];  // массив для отмеченных вариантов ответов (текст)
+        if (a1.length !== array[i - 1].correctAnswer.length) { // ответ неверный, возвращаем конструкцию
+          a1.forEach(el => a2.push(el.nextSibling.data));
+          return res_ans += `<div>Вопрос №${i}: ${array[i - 1].question}</div><div class="red">Ваш ответ:<br>${a2.join('<br>')}</div> <div class="green">Правильный ответ:<br>${array[i - 1].correctAnswer.join('<br>')}</div>`;
+        } else if (a1.length == array[i - 1].correctAnswer.length) { // ответ возможно верный, проверяем
+          //array[i-1].correctAnswer.some(elem => elem == el.nextSibling.data)
+          a1.forEach(el => a2.push(el.nextSibling.data));
+          array[i - 1].correctAnswer.join('<br>') == a2.join('<br>') ? null : res_ans += `<div>Вопрос №${i}: ${array[i - 1].question}</div><div class="red">Ваш ответ:<br>${arr.join('<br>')}</div> <div class="green">Правильный ответ:<br>${array[i - 1].correctAnswer.join('<br>')}</div>`; // если ответ верный, пропускаем, иначе формируем конструкцию
+        }
+      } else { // формирование конструкции при неверном ответе
+        txt = ans_user.find(el => el.checked).nextSibling.textContent;
+        if (txt !== array[i - 1].correctAnswer) {
+          res_ans += `<div>Вопрос №${i}: ${array[i - 1].question}</div><div class="red">Ваш ответ:<br>${txt}</div> <div class="green">Правильный ответ:<br>${array[i - 1].correctAnswer}</div>`;
+        }
+      }
+
+      return true;
+    }
+
+    function write() {
+      title = `<h1 class="num_ans">Вопрос № ${i} из ${countQuestions}</h1>`;
+      content.innerHTML = title + text;
+      text = "";
+    }
+
+    function showAllCorrectAnswers() {
+      array.forEach((el, idx) => {
+        let str = Array.isArray(el.correctAnswer) ? `${el.correctAnswer.join('<br>')}` : el.correctAnswer;
+        res_ans += `<b>${idx + 1}. ${el.question}</b><br>${str}<br><br>`;
+      })
+      end()
+      result.scrollIntoView({behavior: 'smooth'});
+    }
+
+    document.addEventListener('keyup', e => {
+      let h = document.documentElement.offsetHeight; // window.innerHeight;
+      if(e.key == ']' || e.key == "ъ") {
+        showAllCorrectAnswers();
+        // window.scroll(0, h-5);
+      } else if (e.keyCode > 65 && e.keyCode < 90) document.location.reload();
+    })
+
+    /*
+        function back() {
+          cycle(--i);
+          write(++i);
+          i--;
+          if (i < 1) {
+            btnBack.classList.add("none");
+            i++;
+          }
+          btnForward.classList.remove("none");
+          btnEnd.classList.add("none");
+       }
+    */
+    function forward() {
+      if (!checkAns()) return;
+      btnForward.style = 'cursor: not-allowed;'
+      cycle();
+      i++;
+      write();
+      btnEnd.classList.remove("none");
+
+      if (i == array.length) {
+        btnForward.classList.add("none");
+        //btnEnd.classList.remove("none");
+        btnEnd.textContent = "Закончить тест";
+        i--;
+      }
+      //btnBack.classList.remove("none");
+    }
+
+    function end() {
+      btnEnd.classList.add("none");
+      btnForward.classList.add("none");
+      btnRestart.classList.remove("none");
+      btnRestart.classList.add("restart");
+      content.classList.add("none");
+      result.classList.remove("none");
+      //i++;
+      checkAns();
+      if (!res_ans) {
+        res_ans = `<div class="result_corr">Поздравляем!!!<br>Все ответы верные.</div>`;
+      }
+      result.innerHTML = res_ans;
+    }
+  </script>
+</body>
+
+</html>
